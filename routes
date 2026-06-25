@@ -1,0 +1,101 @@
+const express = require("express");
+const router = express.Router();
+
+const Complaint = require("../models/complaint");
+
+
+// CREATE Complaint
+router.post("/", async (req, res) => {
+    try {
+        const complaint = new Complaint(req.body);
+        const savedComplaint = await complaint.save();
+
+        res.status(201).json(savedComplaint);
+    } catch (err) {
+        res.status(400).json({
+            message: err.message
+        });
+    }
+});
+
+
+// GET ALL Complaints
+router.get("/", async (req, res) => {
+    try {
+        const complaints = await Complaint.find();
+
+        res.status(200).json(complaints);
+    } catch (err) {
+        res.status(500).json({
+            message: err.message
+        });
+    }
+});
+
+
+// GET Complaint BY ID
+router.get("/:id", async (req, res) => {
+    try {
+        const complaint = await Complaint.findById(req.params.id);
+
+        if (!complaint) {
+            return res.status(404).json({
+                message: "Complaint not found"
+            });
+        }
+
+        res.status(200).json(complaint);
+    } catch (err) {
+        res.status(500).json({
+            message: err.message
+        });
+    }
+});
+
+
+// UPDATE Complaint
+router.put("/:id", async (req, res) => {
+    try {
+        const complaint = await Complaint.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            { new: true }
+        );
+
+        if (!complaint) {
+            return res.status(404).json({
+                message: "Complaint not found"
+            });
+        }
+
+        res.status(200).json(complaint);
+    } catch (err) {
+        res.status(400).json({
+            message: err.message
+        });
+    }
+});
+
+
+// DELETE Complaint
+router.delete("/:id", async (req, res) => {
+    try {
+        const complaint = await Complaint.findByIdAndDelete(req.params.id);
+
+        if (!complaint) {
+            return res.status(404).json({
+                message: "Complaint not found"
+            });
+        }
+
+        res.status(200).json({
+            message: "Complaint Deleted Successfully"
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: err.message
+        });
+    }
+});
+
+module.exports = router;
